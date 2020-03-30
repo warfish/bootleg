@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "pci.h"
+#include "dataseg.h"
 
 static void _putc(char c)
 {
@@ -171,6 +172,7 @@ int main(void)
     enable_low_ram();
     _puts("low mem enabled"); _putline();
 
+    init_dataseg();
     return 0;
 }
 
