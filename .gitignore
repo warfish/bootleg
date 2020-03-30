@@ -1,0 +1,8 @@
+*.o
+.*.swp
+.*.swo
+*.log
+*.elf32
+*.bin
+*.map
+tags
