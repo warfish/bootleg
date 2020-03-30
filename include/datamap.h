@@ -14,3 +14,10 @@
 
 /** heap arena lookup table pointer */
 #define HEAP_LOOKUP_PTR_ADDR (DATASEG_BASE + DATASEG_SIZE)
+
+/**
+ * C-seg
+ */
+
+#define HEAP_BASE 0x000C0000ul
+#define HEAP_SIZE (64ul << 10)

@@ -5,6 +5,7 @@
 #include "pci.h"
 #include "dataseg.h"
 #include "logging.h"
+#include "heap.h"
 
 void* memset(void* s, int c, size_t n)
 {
@@ -115,6 +116,8 @@ int main(void)
     LOG_DEBUG("low mem enabled\n");
 
     init_dataseg();
+    init_heap();
+
     return 0;
 }
 
