@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "pci.h"
+
 static void _putc(char c)
 {
     __asm__ volatile("out %%al, %%dx" ::"a"(c), "d"(0x402):);
@@ -138,11 +140,36 @@ void exception_handler(unsigned long num, struct exception_frame32* frame)
     _puts("ESP: "); _putx32(frame->esp); _putline();
 }
 
+static void enable_low_ram(void)
+{
+    uint32_t i440fx = pci_make_bdf(0, 0, 0);
+    uint32_t pam02 = pci_read32(i440fx, 0x58);
+    uint32_t pam36 = pci_read32(i440fx, 0x5C);
+
+    pam02 |= 0x33333000; /* PAM0 starts at 0x59, avoid touching 0x58 */
+    pam36 |= 0x33333333;
+
+    pci_write32(i440fx, 0x58, pam02);
+    pci_write32(i440fx, 0x5C, pam36);
+
+    pam02 = pci_read32(i440fx, 0x58);
+    pam36 = pci_read32(i440fx, 0x5C);
+
+#ifdef DEBUG
+    for (uint32_t* ptr = 0x000E0000; ptr < 0x000F0000; ++ptr) {
+        *ptr = 0xEEEEEEEE;
+    }
+
+    for (uint32_t* ptr = 0x000F0000; ptr < 0x00100000; ++ptr) {
+        *ptr = 0xFFFFFFFF;
+    }
+#endif
+}
+
 int main(void)
 {
-    _puts("Hello world\n");
-    _putx32(0xDEADF00D);
-    _putline();
+    enable_low_ram();
+    _puts("low mem enabled"); _putline();
 
     return 0;
 }
