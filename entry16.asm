@@ -187,7 +187,10 @@ isr27:
 isr28:
 isr29:
 isr30:
-isr31: ud2
+isr31:
+
+global abort
+abort: ud2
 
 
 ; ------------------------------------------------------------------------------
@@ -247,20 +250,12 @@ use32
     mov     ax, 0x18
     mov     ss, ax
 
-    ; Set stack to low 4k memory for now
+    ; Set stack to low 4k memory
     mov     esp, 0x1000
 
     ; Call C entry point
     ; TODO: report exit status to fw_cfg?
-    _putc   'x'
     call    _start
-    mov     eax, 0x11111111
-    mov     ebx, 0x22222222
-    mov     ecx, 0x33333333
-    mov     edx, 0x44444444
-    mov     edi, 0x55555555
-    mov     esi, 0x66666666
-    ud2
     hlt
 
 section .resetvector16 exec

@@ -1,14 +1,6 @@
-/*
- * TODO:
- * * A20 line
- * * NMIs
- */
-
-#include <stdbool.h>
-
-typedef unsigned char   uint8_t;
-typedef unsigned short  uint16_t;
-typedef unsigned int    uint32_t;
+#include <types.h>
+#include <assert.h>
+#include <stdlib.h>
 
 static void _putc(char c)
 {
@@ -59,6 +51,55 @@ static void _putx32(uint32_t v)
         v >>= 8;
     }
 }
+
+static void _putul(unsigned long v)
+{
+    /* ULONG_MAX = 4294967295 */
+    char buffer[10];
+    buffer[9] = '\0';
+    char* pbuf = &buffer[8];
+
+    do {
+        *pbuf-- = v % 10;
+        v /= 10;
+    } while (v);
+
+    _puts(pbuf + 1);
+}
+
+void bzero(void* s, size_t n)
+{
+    __asm__ volatile("\
+        xor     %%eax, %%eax    \t\n\
+        rep     stosl           \t\n\
+    "::"c"(n) :"memory");
+}
+
+void* memcpy(void* dest, const void* src, size_t n)
+{
+    uint32_t* pdest32 = (uint32_t*)dest;
+    const uint32_t* psrc32 = (const uint32_t*)src;
+
+    for (size_t i = 0; i < (n >> 2); ++i) {
+        *pdest32++ = *psrc32++;
+    }
+
+    for (size_t i = 0; i < (n & 3); ++i) {
+        *(uint8_t*)pdest32++ = *(uint8_t*)psrc32++;
+    }
+
+    return dest;
+}
+
+void _assert(const char* file, unsigned long line, const char* reason)
+{
+    _puts("Assertion \""); _puts(reason); _puts("\" failed at file ");
+    _puts(file); _puts(" line "); _putul(line);
+    _putline();
+
+    abort();
+}
+
 
 /**
  * Exception frame record.
