@@ -4,71 +4,7 @@
 
 #include "pci.h"
 #include "dataseg.h"
-
-static void _putc(char c)
-{
-    __asm__ volatile("out %%al, %%dx" ::"a"(c), "d"(0x402):);
-}
-
-static void _puts(const char* s)
-{
-    while (*s != '\0') {
-        _putc(*s++);
-    }
-}
-
-static void _putline(void)
-{
-    _putc('\n');
-}
-
-static char _hex2char(uint8_t v)
-{
-    return (v <= 9 ? '0' + v : 'A' - 0xA + v);
-}
-
-static void _putx8(uint8_t v)
-{
-    _putc(_hex2char((v & 0xF0) >> 4));
-    _putc(_hex2char(v & 0x0F));
-}
-
-static void _putx16(uint16_t v)
-{
-    __asm__ volatile("xchg %%al, %%ah" :"=a"(v) :"a"(v) :);
-    
-    _puts("0x");
-    for (unsigned i = 0; i < 2; ++i) {
-        _putx8(v & 0xFF);
-        v >>= 8;
-    }
-}
-
-static void _putx32(uint32_t v)
-{
-    __asm__ volatile("bswap %%eax" :"=a"(v) :"a"(v) :);
-    
-    _puts("0x");
-    for (unsigned i = 0; i < 4; ++i) {
-        _putx8(v & 0xFF);
-        v >>= 8;
-    }
-}
-
-static void _putul(unsigned long v)
-{
-    /* ULONG_MAX = 4294967295 */
-    char buffer[10];
-    buffer[9] = '\0';
-    char* pbuf = &buffer[8];
-
-    do {
-        *pbuf-- = v % 10;
-        v /= 10;
-    } while (v);
-
-    _puts(pbuf + 1);
-}
+#include "logging.h"
 
 void bzero(void* s, size_t n)
 {
@@ -106,10 +42,7 @@ size_t strlen(const char* s)
 
 void _assert(const char* file, unsigned long line, const char* reason)
 {
-    _puts("Assertion \""); _puts(reason); _puts("\" failed at file ");
-    _puts(file); _puts(" line "); _putul(line);
-    _putline();
-
+    LOG_ERROR("Assertion \"%s\" failed at file %s, line %u\n", reason, file, line);
     abort();
 }
 
@@ -136,19 +69,19 @@ struct exception_frame32 {
 
 void exception_handler(unsigned long num, struct exception_frame32* frame)
 {
-    _puts("Exception "); _putx16(num); _putline();
-    _puts("CS: "); _putx16(frame->cs); _putline();
-    _puts("EIP: "); _putx32(frame->eip); _putline();
-    _puts("EFLAGS: "); _putx32(frame->eflags); _putline();
-    _puts("Error code: "); _putx32(frame->error_code); _putline();
-    _puts("EAX: "); _putx32(frame->eax); _putline();
-    _puts("EBX: "); _putx32(frame->ebx); _putline();
-    _puts("ECX: "); _putx32(frame->ecx); _putline();
-    _puts("EDX: "); _putx32(frame->edx); _putline();
-    _puts("EDI: "); _putx32(frame->edi); _putline();
-    _puts("ESI: "); _putx32(frame->esi); _putline();
-    _puts("EBP: "); _putx32(frame->ebp); _putline();
-    _puts("ESP: "); _putx32(frame->esp); _putline();
+    LOG_ERROR("Exception 0x%hx\n", num);
+    LOG_ERROR("CS: %hx\n", frame->cs);
+    LOG_ERROR("EIP: %x\n", frame->eip);
+    LOG_ERROR("EFLAGS: %x\n", frame->eflags);
+    LOG_ERROR("Error code: %x\n", frame->error_code);
+    LOG_ERROR("EAX: 0x%x\n", frame->eax);
+    LOG_ERROR("EBX: 0x%x\n", frame->ebx);
+    LOG_ERROR("ECX: 0x%x\n", frame->ecx);
+    LOG_ERROR("EDX: 0x%x\n", frame->edx);
+    LOG_ERROR("EDI: 0x%x\n", frame->edi);
+    LOG_ERROR("ESI: 0x%x\n", frame->esi);
+    LOG_ERROR("EBP: 0x%x\n", frame->ebp);
+    LOG_ERROR("ESP: 0x%x\n", frame->esp);
 }
 
 static void enable_low_ram(void)
@@ -180,7 +113,7 @@ static void enable_low_ram(void)
 int main(void)
 {
     enable_low_ram();
-    _puts("low mem enabled"); _putline();
+    LOG_DEBUG("low mem enabled\n");
 
     init_dataseg();
     return 0;
