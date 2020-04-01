@@ -6,12 +6,11 @@
 #include "dataseg.h"
 #include "logging.h"
 
-void bzero(void* s, size_t n)
+void* memset(void* s, int c, size_t n)
 {
-    __asm__ volatile("\
-        xor     %%eax, %%eax    \t\n\
-        rep     stosl           \t\n\
-    "::"c"(n) :"memory");
+    /* We just assume we have ERMSB */
+    __asm__ volatile ("rep stosb" : :"D"(s), "c"(n), "a"((uint8_t)c) :"memory");
+    return s;
 }
 
 void* memcpy(void* dest, const void* src, size_t n)

@@ -48,5 +48,5 @@ void* dataseg_alloc(size_t size)
 
 void dataseg_scrub(void)
 {
-    bzero((void*)DATASEG_BASE, DATASEG_SIZE);
+    memset((void*)DATASEG_BASE, 0, DATASEG_SIZE);
 }
