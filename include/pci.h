@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include <inttypes.h>
 #include "io.h"
 
 #define PCI_CONFADDR ((uint16_t)0x0CF8)

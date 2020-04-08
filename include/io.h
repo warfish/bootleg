@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include <inttypes.h>
 
 static inline void out32(uint16_t port, uint32_t val)
 {
