@@ -94,6 +94,16 @@ void* memcpy(void* dest, const void* src, size_t n)
     return dest;
 }
 
+size_t strlen(const char* s)
+{
+    size_t len = 0;
+    while (*s++ != '\0') {
+        ++len;
+    }
+
+    return len;
+}
+
 void _assert(const char* file, unsigned long line, const char* reason)
 {
     _puts("Assertion \""); _puts(reason); _puts("\" failed at file ");
