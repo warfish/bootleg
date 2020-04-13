@@ -102,3 +102,19 @@
     mov     eax, %1
     _putdw
 %endmacro
+
+%macro _putqw 0
+    mov     cl, 8
+    bswap   rax
+    %%.iter:
+    _putb
+    shr     rax, 8
+    dec     cl
+    test    cl, cl
+    jnz     %%.iter
+%endmacro
+
+%macro _putqw 1
+    mov     rax, %1
+    _putqw
+%endmacro

@@ -3,6 +3,7 @@
 .*.swo
 *.log
 *.elf32
+*.elf64
 *.bin
 *.map
 tags

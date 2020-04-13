@@ -1,5 +1,5 @@
-OUTPUT_ARCH(i386)
-OUTPUT_FORMAT(elf32-i386)
+OUTPUT_ARCH(i386:x86-64)
+OUTPUT_FORMAT(elf32-x86-64)
 
 MEMORY {
     /* LD will look for regions in order of definition.
@@ -17,7 +17,7 @@ SECTIONS {
     .text : { *(.text) *(.text.*) *(.code) }
     .data : { *(.data) }
     .bss  : { *(.bss) }
-    .rodata : { *(.rodata) }
+    .rodata : { *(.rodata) *(.rodata.*) }
 
     /* 16-bit segment need to explictly be in an f-segment
      * so that resetvector can near-jump to it */
@@ -30,6 +30,9 @@ SECTIONS {
     .code32 : {
         *(.code32)
     } > FSEG_HIGH
+    .code64 : {
+        *(.code64)
+    } > FSEG_HIGH
 
     /* pad resetvector up to 16 bytes */
     .resetvector16 ORIGIN(FSEG_HIGH) + LENGTH(FSEG_HIGH) - 16 : {
@@ -40,4 +43,4 @@ SECTIONS {
     /DISCARD/ : { *(.comment) }
 }
 
-NOCROSSREFS_TO(.code16 .text)
+NOCROSSREFS_TO(.text .code16 .code32);

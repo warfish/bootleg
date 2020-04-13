@@ -67,6 +67,34 @@ struct exception_frame32 {
     uint32_t eflags;
 };
 
+static uint32_t read_cr0(void)
+{
+    uint32_t res;
+    __asm__ volatile ("mov %%cr0, %%eax":"=a"(res)::);
+    return res;
+}
+
+static uint32_t read_cr2(void)
+{
+    uint32_t res;
+    __asm__ volatile ("mov %%cr2, %%eax":"=a"(res)::);
+    return res;
+}
+
+static uint32_t read_cr3(void)
+{
+    uint32_t res;
+    __asm__ volatile ("mov %%cr3, %%eax":"=a"(res)::);
+    return res;
+}
+
+static uint32_t read_cr4(void)
+{
+    uint32_t res;
+    __asm__ volatile ("mov %%cr4, %%eax":"=a"(res)::);
+    return res;
+}
+
 void exception_handler(unsigned long num, struct exception_frame32* frame)
 {
     LOG_ERROR("Exception 0x%hx\n", num);
@@ -82,6 +110,10 @@ void exception_handler(unsigned long num, struct exception_frame32* frame)
     LOG_ERROR("ESI: 0x%x\n", frame->esi);
     LOG_ERROR("EBP: 0x%x\n", frame->ebp);
     LOG_ERROR("ESP: 0x%x\n", frame->esp);
+    LOG_ERROR("CR0: 0x%x\n", read_cr0());
+    LOG_ERROR("CR2: 0x%x\n", read_cr2());
+    LOG_ERROR("CR3: 0x%x\n", read_cr3());
+    LOG_ERROR("CR4: 0x%x\n", read_cr4());
 }
 
 static void enable_low_ram(void)
