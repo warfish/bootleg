@@ -6,6 +6,7 @@
 #include "dataseg.h"
 #include "logging.h"
 #include "heap.h"
+#include "apic.h"
 
 void* memset(void* s, int c, size_t n)
 {
@@ -145,10 +146,12 @@ static void enable_low_ram(void)
 int main(void)
 {
     enable_low_ram();
-    LOG_DEBUG("low mem enabled\n");
+    LOG_DEBUG("low mem enabled at 0x%llx\n", 0x000E0000ull);
 
     init_dataseg();
     init_heap();
+
+    init_apic();
 
     return 0;
 }

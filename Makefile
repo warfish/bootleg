@@ -1,7 +1,7 @@
 NASM ?= nasm
 OBJCOPY ?= objcopy
 CC = gcc
-OBJS = entry16.o start64.o dataseg.o libstd/vfprintf.o heap.o
+OBJS = entry16.o start64.o dataseg.o libstd/vfprintf.o heap.o apic.o
 CFLAGS = -Wall -std=c11 -ffreestanding -nostdlib -m64 -mcmodel=large -mno-red-zone -fno-stack-protector -fno-pic -Iinclude -Iinclude/libstd -Os
 LIBGCC = $(shell $(CC) -m64 -print-libgcc-file-name)
 
